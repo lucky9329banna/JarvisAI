@@ -1,0 +1,154 @@
+import { useState, useRef, useEffect } from "react";
+import "./styles/jarvis.css";
+import jarvisLogo from "./assets/jarvis-logo.png";
+import { GoogleGenAI } from "@google/genai";
+
+const ai = new GoogleGenAI({
+  apiKey: import.meta.env.VITE_GEMINI_API_KEY,
+});
+
+export default function App() {
+  const [question, setQuestion] = useState("");
+  const [messages, setMessages] = useState([
+    {
+      sender: "Jarvis",
+      text: "👋 Hello! I am Jarvis AI. Ask me anything.",
+    },
+  ]);
+
+  const chatEndRef = useRef(null);
+
+  useEffect(() => {
+    chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
+
+  function speak(text) {
+    speechSynthesis.cancel();
+
+    const speech = new SpeechSynthesisUtterance(text);
+    speech.lang = "en-US";
+    speech.rate = 0.8;
+    speech.pitch = 0.5;
+    speech.volume = 1;
+
+    const voices = speechSynthesis.getVoices();
+
+    const maleVoice =
+      voices.find(v => v.name.includes("Google US English")) ||
+      voices.find(v => v.name.includes("Microsoft David")) ||
+      voices.find(v => v.lang === "en-US") ||
+      voices[0];
+
+    if (maleVoice) {
+      speech.voice = maleVoice;
+    }
+
+    speechSynthesis.speak(speech);
+  }
+function startListening() {
+    const SpeechRecognition =
+      window.SpeechRecognition || window.webkitSpeechRecognition;
+
+    if (!SpeechRecognition) {
+      alert("Speech Recognition not supported");
+      return;
+    }
+
+    const recognition = new SpeechRecognition();
+    recognition.lang = "en-US";
+    recognition.start();
+
+    recognition.onresult = (e) => {
+      setQuestion(e.results[0][0].transcript);
+    };
+  }
+
+  async function askJarvis() {
+    if (!question.trim()) return;
+
+    const userQuestion = question;
+
+    setMessages((prev) => [
+      ...prev,
+      {
+        sender: "You",
+        text: userQuestion,
+      },
+    ]);
+
+    setQuestion("");
+
+    try {
+      const response = await ai.models.generateContent({
+        model: "gemini-2.5-flash",
+        contents: userQuestion,
+      });
+
+      const answer = response.text;
+
+      setMessages((prev) => [
+        ...prev,
+        {
+          sender: "Jarvis",
+          text: answer,
+        },
+      ]);
+
+      speak(answer);
+
+    } catch (error) {
+      setMessages((prev) => [
+        ...prev,
+        {
+          sender: "Jarvis",
+          text: "❌ Error: Unable to contact AI.",
+        },
+      ]);
+    }
+  }
+return (
+    <div className="app">
+      <div className="header">
+        <img src={jarvisLogo} className="logo" alt="Jarvis Logo" />
+        <h1>JARVIS AI</h1>
+      </div>
+
+      <div className="chatBox">
+        {messages.map((msg, index) => (
+          <div
+            key={index}
+            className={
+              msg.sender === "You"
+                ? "message user"
+                : "message jarvis"
+            }
+          >
+            <b>{msg.sender}:</b>
+            <br />
+            {msg.text}
+          </div>
+        ))}
+
+        <div ref={chatEndRef}></div>
+      </div>
+
+      <div className="bottomBar">
+        <input
+          type="text"
+          value={question}
+          placeholder="Ask Jarvis..."
+          onChange={(e) => setQuestion(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") askJarvis();
+          }}
+        />
+
+        <button onClick={startListening}>🎤</button>
+
+        <button onClick={askJarvis}>
+          Send
+        </button>
+      </div>
+    </div>
+  );
+}
