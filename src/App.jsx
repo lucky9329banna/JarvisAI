@@ -3,9 +3,9 @@ import "./styles/jarvis.css";
 import jarvisLogo from "./assets/jarvis-logo.png";
 import { GoogleGenAI } from "@google/genai";
 
-const ai = new GoogleGenAI({
-  apiKey: import.meta.env.VITE_GEMINI_API_KEY,
-});
+// const ai = new GoogleGenAI({
+//   apiKey: import.meta.env.VITE_GEMINI_API_KEY,
+// });
 
 export default function App() {
   const [question, setQuestion] = useState("");
@@ -64,6 +64,9 @@ function startListening() {
   }
 
   async function askJarvis() {
+  alert("Jarvis is working!");
+  return;
+
     if (!question.trim()) return;
 
     const userQuestion = question;
