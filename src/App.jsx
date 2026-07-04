@@ -61,7 +61,8 @@ function startListening() {
     };
   }
 
-  async function askJarvis() {
+ async function askJarvis() {
+  alert("Send button clicked");
 
   if (!question.trim()) return;
 
@@ -149,10 +150,15 @@ return (
         />
 
         <button onClick={startListening}>🎤</button>
-
-        <button onClick={askJarvis}>
-          Send
-        </button>
+  
+        <button
+         onClick={() => {
+           alert("Button Works");
+           askJarvis();
+         }}
+      >
+         Send
+       </button>
       </div>
     </div>
   );
