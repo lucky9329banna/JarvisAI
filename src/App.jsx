@@ -106,15 +106,17 @@ function startListening() {
       speak(answer);
 
     } catch (error) {
-      setMessages((prev) => [
-        ...prev,
-        {
-          sender: "Jarvis",
-          text: "❌ Error: Unable to contact AI.",
-        },
-      ]);
-    }
-  }
+  alert(error.message);
+  console.log(error);
+
+  setMessages((prev) => [
+    ...prev,
+    {
+      sender: "Jarvis",
+      text: "❌ " + error.message,
+    },
+  ]);
+}
 return (
     <div className="app">
       <div className="header">
