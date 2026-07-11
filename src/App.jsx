@@ -106,17 +106,18 @@ function startListening() {
       speak(answer);
 
     } catch (error) {
-  alert(error.message);
-  console.log(error);
+      alert(error.message);
+      console.log(error);
 
-  setMessages((prev) => [
-    ...prev,
-    {
-      sender: "Jarvis",
-      text: "❌ " + error.message,
-    },
-  ]);
-}
+      setMessages((prev) => [
+        ...prev,
+        {
+          sender: "Jarvis",
+          text: "❌ " + error.message,
+        },
+      ]);
+    }
+  }
 return (
     <div className="app">
       <div className="header">
